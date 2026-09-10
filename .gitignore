@@ -216,3 +216,33 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Ignorer les liens symboliques et les dossiers de données/résultats
+/Data/
+
+
+# Sécurité : Ignorer les données massives et fichiers temporaires
+*.fasta
+*.fasta.gz
+*.fa
+*.fastq
+*.faa
+*.fna
+*.fsa
+
+# Ignorer les bases de données BLAST générées
+*.phr
+*.pin
+*.psq
+*.nhr
+*.nin
+*.nsq
+
+# Ignorer les gros fichiers de résultats
+*.csv
+*.tsv
+*.sam
+*.bam
+*.vcf
+*.bed
