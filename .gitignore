@@ -246,3 +246,10 @@ __marimo__/
 *.bam
 *.vcf
 *.bed
+
+# Environnements virtuels et paquets
+conda/
+
+# Données lourdes et résultats
+reference_S288C/
+resultats_blast/
