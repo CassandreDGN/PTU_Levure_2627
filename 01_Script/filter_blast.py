@@ -10,39 +10,58 @@ def parse__blast(input_file, output_file):
         for line in f:
             line = line.strip()
 
+            if not line or line.startswith("#"):
+                continue
 
             cols = line.split("\t")
-            if len(cols) < 12:
+            if len(cols) < 2:
                 continue
 
             gene_souche = cols[0].split("|")[0]
             gene_ref = cols[1]
-            bit_score = float(cols[11])
 
-            if (gene_souche not in best_matches or bit_score > best_matches[gene_souche][1]):best_matches[gene_souche] = (gene_ref, bit_score)
+            best_matches[gene_souche] = gene_ref #peut être juste ignorer si clé déjà existante
 
     with open(output_file, "w") as out:
         out.write("gene_souche\tgene_ref\n")
-        for g_souche, (g_ref, x) in best_matches.items():
+        for g_souche, g_ref in best_matches.items():
             out.write(f"{g_souche}\t{g_ref}\n")
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Nettoie un fichier output de Blast pour retenir seulement le meilleur match souche/reference pour chaque gène ainsi que le score")
+    parser = argparse.ArgumentParser(
+        description="Parcourt un dossier de résultats BLAST et génère un fichier TSV filtré pour chaque souche."
+    )
 
-    parser.add_argument("-i", "--input", required=True, help="Fichier .txt résultat BLAST en input")
-    parser.add_argument("-o", "--output", help="Fichier TSV de sortie ou dossier de destination")
+    parser.add_argument(
+        "-i",
+        "--input",
+        required=True,
+        help="Dossier contenant les fichiers de résultats BLAST en input",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Dossier de destination des fichiers TSV",
+    )
 
     args = parser.parse_args()
 
-    base_filename = os.path.basename(args.input)
-    strain_prefix = ".".join(base_filename.split(".")[:2])
-    generated_filename = f"mapping_{strain_prefix}.tsv"
+    input_dir = args.input
+    output_dir = args.output if args.output else input_dir
 
-    if not args.output:
-        args.output = generated_filename
-    elif os.path.isdir(args.output):
-        args.output = os.path.join(args.output, generated_filename)
+    os.makedirs(output_dir, exist_ok=True)
 
-    parse__blast(args.input, args.output)
+    for filename in os.listdir(input_dir):
+        if filename.endswith(".txt"):
+            input_path = os.path.join(input_dir, filename)
+
+            strain_prefix = ".".join(filename.split(".")[:2])
+            generated_filename = f"clean_results_{strain_prefix}.tsv"
+            output_path = os.path.join(output_dir, generated_filename)
+
+            print(f"Traitement de {filename} -> {generated_filename}...")
+            parse__blast(input_path, output_path)
+
+    print("Fin du traitement.")
