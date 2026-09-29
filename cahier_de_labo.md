@@ -90,4 +90,51 @@ for fichier in *.fa; do
 done
 ```
 
+***
 
+## 28/09/2026
+* **Rayan** : Ecriture d'un plan déterminant les étapes à suivre pour le déroulement du projet
+* **Cassandre** : Développement du script de traduction des CDS en protéines (Étape 1 du pipeline) et mise en place du contrôle qualité (QC) strict sur un sous-échantillon de test.
+
+>### Environnement logiciel & Outils
+* **Langage** : Python
+* **Outils principaux** : 
+  * Script `1_CDStoPROTEIN.py` (librairies standards `os`, `sys`, `argparse`)
+
+>### Lignes de commande utilisées
+
+### Etape 1 : Développement du script de traduction et de QC (`1_CDStoPROTEIN.py`)
+* Création d'un script Python permettant la traduction nucléotide vers acide aminé.
+* Implémentation des règles de rejet strictes (QC) pour isoler les protéines valides :
+  * Longueur non multiple de 3 (frameshift)
+  * Absence de codon START (`ATG`)
+  * Présence de nucléotides ambigus (`N`) ou codons invalides
+  * Présence d'un codon STOP prématuré
+  * Protéines trop courtes (< 30 AA)
+
+### Etape 2 : Test sur un sous-échantillon
+* Données d'entrée (test) : `/data/projet1/subgroup_test` (6 fichiers `.cds.fa`).
+* Lancement du script sur les données de test :
+
+```bash
+python3 /data/projet1/01_Script/1_CDStoPROTEIN.py \
+  -i /data/projet1/subgroup_test \
+  -o /data/projet1/02_Test_Proteins \
+  -m 30
+```
+
+### Etape 3 : Débogage et Troubleshooting
+* **Problème rencontré** : Taux de rejet >85% avec le motif `Codon inv`. 
+* **Inspection des séquences rejetées** :
+
+```bash
+head -n 11 /data/projet1/02_Test_Proteins/rejected_sequences.tsv
+```
+
+* **Diagnostic et Correction** : Le log d'erreur a montré que le codon `TGG` était systématiquement rejeté. Le dictionnaire interne `CODON_TABLE` a été mis à jour pour intégrer le Tryptophane (W) manquant et sécurisé avec les 64 codons complets.
+
+### Etape 4 : Exécution finale et validation
+* Relance du script après modification du dictionnaire.
+* Vérification des sorties :
+  * Génération des séquences protéiques propres (`*.prot.fasta`).
+  * Création des journaux de logs : `qc_summary.tsv` (confirmant le passage de la quasi-totalité des CDS) et `rejected_sequences.tsv` (détaillant la position des quelques anomalies restantes).
