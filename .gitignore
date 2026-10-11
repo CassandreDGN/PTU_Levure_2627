@@ -253,8 +253,14 @@ __marimo__/
 *.bed
 
 # Environnements virtuels et paquets
-conda/
+06_Conda/
+02_Pipeline_Output/
+00_Data/
+04_Resultats_BlastN/
+
 
 # Données lourdes et résultats
 reference_S288C/
 resultats_blast/
+00_Data/provean_db/
+
