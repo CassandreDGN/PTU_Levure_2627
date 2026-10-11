@@ -170,3 +170,9 @@ Exécution et automatisation du pipeline d'analyse fonctionnelle des variantes p
 ### État de l'environnement & Perspectives
 - **Conservation de l'environnement virtuel :**
   - L'environnement Conda dédié (`provean_env`), situé sous `06_Conda/provean_env`, a été conservé intact sur la machine virtuelle.
+
+###11 octobre 2026
+-  **Beray**
+- **Analyse et Synthèse des résultats BLAST** : Écriture et exécution du script `resume_blast.py` pour parcourir l'ensemble des fichiers de résultats d'alignement (`_resultat.txt`), filtrer pour ne conserver que le meilleur alignement par gène (via le meilleur `bit_score`), et regrouper les données dans un tableau global unique (`/data/projet1/tableau_synthese_blast.csv`).
+- Début de l'analyse comparative des souches par rapport à la référence pour identifier les anomalies structurelles, notamment la recherche de protéines tronquées et de codons stop prématurés.
+- Pas encore essayé provean :(
