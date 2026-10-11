@@ -154,3 +154,19 @@ python3 /data/projet1/01_Script/02.1_blastP.py
     -q /data/projet1/02_Pipeline_Output/traduction_test_batch \
     -r /data/projet1/00_Data/reference_S288C/orf_trans_all.fasta \
     -o /data/projet1/02_Pipeline_Output/03_Mutations
+
+##10 octobre 2026
+-  **Cassandre** 
+
+### Objectif
+Exécution et automatisation du pipeline d'analyse fonctionnelle des variantes protéiques avec PROVEAN.
+
+### Travail effectué & Problèmes rencontrés
+- **Tentatives d'exécution du script PROVEAN :**
+  - Configuration et tests prolongés du script de lancement PROVEAN (`03.2_run_provean.sh`) et des dépendances associées (PSI-BLAST, bases de données de référence).
+  - Nombreux échecs et erreurs rencontrés lors des exécutions successives sur le jeu de données, principalement liés à la gestion des chemins, des formats d'entrée et des dépendances logicielles.
+  - Après plusieurs heures de sueur et de rage intense sur les multiples essais, le ragequit a gagné et la  décision a été prise de nettoyer le répertoire de travail et d'éliminer le script dysfonctionnel (`03.2_run_provean.sh`) afin de maintenir un espace de travail propre et exempt de scripts obsolètes.
+
+### État de l'environnement & Perspectives
+- **Conservation de l'environnement virtuel :**
+  - L'environnement Conda dédié (`provean_env`), situé sous `06_Conda/provean_env`, a été conservé intact sur la machine virtuelle.
