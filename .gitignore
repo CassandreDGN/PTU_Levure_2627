@@ -2,6 +2,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
+resultats_blast_backup/
 
 # C extensions
 *.so
@@ -208,7 +209,11 @@ tempCodeRunnerFile.py
 
 # PyPI configuration file
 .pypirc
-
+04_Resultats_BlastN/
+02_Pipeline_Output/  
+00_Data/cds_fasta/
+vscode-server/
+05_conda/   
 # Marimo
 marimo/_static/
 marimo/_lsp/
@@ -216,8 +221,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-
-
+ cds_fasta/
+ 00_Data/
 # Ignorer les liens symboliques et les dossiers de données/résultats
 /Data/
 
