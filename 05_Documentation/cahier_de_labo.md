@@ -136,6 +136,7 @@ python3 /data/projet1/01_Script/02.1_blastP.py
 
 - **Cassandre** : Développement du script d'extraction des mutations au format PROVEAN (`.var`) à partir des alignements BLASTp.
 - **Beray** : Traduction des séquences pour adaptation au cheminement et validation du flux BLASTn.
+- **Rayan** : documentation sur different outils de prediction de fonctionalité des genes 
 
 ### Script d'extraction des mutations
 >### Environnement logiciel & Outils
@@ -175,4 +176,28 @@ Exécution et automatisation du pipeline d'analyse fonctionnelle des variantes p
 -  **Beray**
 - **Analyse et Synthèse des résultats BLAST** : Écriture et exécution du script `resume_blast.py` pour parcourir l'ensemble des fichiers de résultats d'alignement (`_resultat.txt`), filtrer pour ne conserver que le meilleur alignement par gène (via le meilleur `bit_score`), et regrouper les données dans un tableau global unique (`/data/projet1/tableau_synthese_blast.csv`).
 - Début de l'analyse comparative des souches par rapport à la référence pour identifier les anomalies structurelles, notamment la recherche de protéines tronquées et de codons stop prématurés.
-- Pas encore essayé provean :(
+- Pas encore essayé provean 
+
+
+## 15 octobre 2026
+- **Cassandre**
+
+### Objectif
+Optimisation du pipeline d'annotation fonctionnelle, développement d'un système de scoring alternatif à PROVEAN et génération des premières visualisations.
+
+### Travail effectué & Problèmes rencontrés
+- **Préparation des données & Alignement :**
+  - Traduction complète des séquences nucléotidiques en séquences protéiques pour l'ensemble des souches.
+  - Remplacement de BLASTp par DIAMOND pour un gain de temps de calcul significatif sur le traitement global des souches.
+- **Développement du Scoring (Alternative PROVEAN) :**
+  - Création du script d'évaluation "fake PROVEAN" (utilisé comme placeholder temporaire pour débloquer et terminer la construction de la pipeline).
+  - Implémentation du modèle d'évaluation basé sur les scores BLOSUM62, avec intégration d'une pénalité pour les indels et du calcul du delta relatif.
+- **Maintenance et débogage :**
+  - Modification des scripts pour corriger de petits problèmes aléatoires apparus lors de l'exécution en série.
+
+### État de l'environnement & Perspectives
+- **Synthèse et Visualisations :**
+  - Résumé des résultats de fonctionnalité par paires pour les génotypes diploïdes.
+  - Génération de visuels finaux préliminaires, qui serviront de base à modifier et optimiser plus tard.
+- **Améliorations futures :**
+  - L'étape d'alignement avec DIAMOND pourra potentiellement être relancée avec l'option `--sensitive` pour garantir plus de précision.
