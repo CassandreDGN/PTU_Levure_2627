@@ -201,3 +201,27 @@ Optimisation du pipeline d'annotation fonctionnelle, développement d'un systèm
   - Génération de visuels finaux préliminaires, qui serviront de base à modifier et optimiser plus tard.
 - **Améliorations futures :**
   - L'étape d'alignement avec DIAMOND pourra potentiellement être relancée avec l'option `--sensitive` pour garantir plus de précision.
+
+
+## 18 octobre 2026
+- **rayan**
+ **Analyse et prediction** : Écriture et exécution du script test provean pour la prediction des genes, script et environement non concluant suprimmé.
+  
+
+  gunzip uniprot_sprot.fasta.gz
+
+
+  antien cahier ;# Cahier de laboratoire - PTU Levures
+
+## 26/10/26
+
+- **Cassandre** : Ecriture d'un brouillon du rapport écrit final
+
+## 27/10/2026
+
+- **Cassandre** : Modification et travail sur le brouillon du rapport écrit
+
+
+
+
+
