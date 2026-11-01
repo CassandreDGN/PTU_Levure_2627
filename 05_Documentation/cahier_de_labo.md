@@ -4,12 +4,14 @@
 ## 13/09/2026
 
 - Mise en place du GitHub (https://github.com/CassandreDGN/PTU_Levure_2627) par Cassandre
-
+- **Définition du sujet** : Analyse des variants fonctionnels sur 400 souches diploïdes de *Saccharomyces cerevisiae*
 ***
 
 ## 15/09/2026
 
 * **Beray** : Préparation de l'espace de travail, téléchargement et indexation du génome de référence S288C, réalisation du test unitaire et exécution du BLAST sur l'ensemble des souches.
+  - Vérification de la disponibilité des données (400 souches diploïdes phasées)
+  - Configuration de l'environnement Conda
 * **Cassandre** : Documentation pour reproductibilité
 
 >### Environnement logiciel & Outils
@@ -18,7 +20,7 @@
 * **Outils principaux** :
   * `blastn` (NCBI BLAST+ v2.x via environnement Conda `env_blast`)
   * `makeblastdb`
-
+  * `wget`, `gunzip` pour les fichiers
 
 >### Lignes de commande utilisées
 
@@ -206,22 +208,105 @@ Optimisation du pipeline d'annotation fonctionnelle, développement d'un systèm
 ## 18 octobre 2026
 - **rayan**
  **Analyse et prediction** : Écriture et exécution du script test provean pour la prediction des genes, script et environement non concluant suprimmé.
-  
-
   gunzip uniprot_sprot.fasta.gz
+antien cahier ;# Cahier de laboratoire - PTU Levures
 
+- **Beray**
+  - **Correction du CSV pour l'analyse de la ploïdie** : Création de `resume_blast_v2.py`
+    - Problème identifié : Dans le CSV actuel, l'info de l'haplotype est mélangée dans le nom du gène (ex: `AAC_HP1_G0000010`), ce qui rend l'analyse difficile
+    - Solution : Réorganisation du CSV pour séparer la colonne Haplotype (HP1/HP2) des autres colonnes (Souche, Gene_Souche, Gene_Reference, Identite, Bit_Score)
+    - Avantages : Possibilité de regrouper par souche + gène de référence, comparer l'état de HP1 vs HP2, appliquer la logique combinatoire (2 inactives = perdu, 1 active + 1 inactive = hétérozygote)
+    - Note : On ne change pas les données, on les réorganise pour que l'Étape 4 soit facile à coder
 
-  antien cahier ;# Cahier de laboratoire - PTU Levures
 
 ## 26/10/26
 
-- **Cassandre** : Ecriture d'un brouillon du rapport écrit final
+- **Cassandre** : 
+  - Structuration et rédaction de la première version du rapport finale
+  - Nettoyage du répertoire partagé
+- **Rayan** : 
+  - Redaction, lancement et suivi de scripts PROVEAN en essayant de résoudre les multiples problèmes rencontrés.
+  - Nettoyage du répertoire partagé
+- **Beray** : 
+  - Développement de scripts de calcults statistiques pour calculer des métriques importants.
+  - Structuration, création figure 1 et développement du rapport finale.
+
 
 ## 27/10/2026
 
-- **Cassandre** : Modification et travail sur le brouillon du rapport écrit
+- **Cassandre** :
+  - Modification et écriture du rapport final (Introduction, Matériel et méthodes, quelques résultats) et création du diapo final
 
 
+## 28/10/2026
+
+- **Cassandre** :
+  - Travail sur le support pour la présentation orale
+  - Rédaction d'entrée dans le cahier de laboratoire
+  - Mise à jour de la structure du projet et de la documentation
+
+- **Rayan** :
+  - **Changement d'outil de prédiction** : Remplacement de PROVEAN par **SIFT** (Installation)
+  - Développement du script d'analyse SIFT4G pour les 400 souches diploïdes
+  - Création des fichiers de configuration et de documentation
+  - Validation de l'environnement SIFT4G
+
+>### Environnement logiciel & Outils
+>* **Outil** : SIFT4G (installé à `/data/projet1/06_Conda/sift_env/bin/sift4g`)
+>* **Script créé** : `sift_analyse.sh`
+>* **Base de données** : `/data/projet1/00_Data/db_sift/uniprot_sprot.fasta`
+>* **Données variants** : `/data/projet1/02_Pipeline_Output/4_Mutations_par_genes/`
+
+>### Configuration
+```bash
+SIFT4G="/data/projet1/06_Conda/sift_env/bin/sift4g"
+VAR_DIR="/data/projet1/02_Pipeline_Output/4_Mutations_par_genes"
+OUT_DIR="/data/projet1/02_Pipeline_Output/4_SIFT_Results"
+```
+
+>### Commandes utiles
+```bash
+bash sift_analyse.sh AAC
+ls 4_SIFT_Results/*.sift
+```
+
+>### Problèmes identifiés
+- PROVEAN : Segmentation fault (cd-hit) - remplacé par SIFT
+- Serveur PTU : Stockage à 96% (58G/64G) - optimisation nécessaire
+
+>### Perspectives
+- Lancer l'analyse SIFT sur un sous-ensemble de gènes
+- Vérifier la qualité des résultats (scores, prédictions)
+- Préparer une base de données plus complète (UniRef, UniProt)
+- Finaliser le rapport
+
+>### Résultats quantitatifs
+- Total variants : **24 809 068**
+- Substitutions : **16 242 651** (65,5 %)
+- Délétions : **7 063 762** (28,5 %)
+- Insertions : **1 502 655** (6,1 %)
+- Moyenne par souche : **61 433 variants**
+- CDS annotés à S288C : **99,3 %**
+- Variants stop/premature : **0** (aucun stop codon, aucune position invalide)
+
+
+## 29/10/2026
+
+- **Cassandre et Rayan** :
+  - Travail sur le script de SIFT (j'ai oublié ce que j'ai fait)
+
+## 30/10/2026
+
+- **Cassandre** :
+  - Travail sur le script de SIFT4G (changement de base de donnée) 
+  - Compréhension et explication des fichiers de sortie de SIFT4G : résolution du mystères des outputs MATRIX
+  - Refonte du script 03.5_joindre_sift_lof.py pour résumer le statut de chaque protéine pour chaque souche = amélioration de la logique pour extraire le statut exact de chaque seq protéique  par haplotype
+  - Finaliser le script 04.diploid_results.py pour résumer les états des souches pour chaque protéine = 
+
+
+## 31/10/2026 
+
+- Travail sur sift pour tester la banque uniprot 
 
 
 

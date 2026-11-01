@@ -1,0 +1,98 @@
+# Rapport technique : Analyse des variants par SIFT
+
+## Contexte du projet
+
+## 1. Contexte
+
+### Objectif
+Évaluer l'impact fonctionnel des variants sur 397 souches diploïdes de *Saccharomyces cerevisiae*.
+
+### Méthodes initiales
+- **PROVEAN** : Échec au stade du clustering (Segmentation fault)
+- **SIFT** : En cours de validation (SIFT4G, disponible via conda)
+
+---
+
+## 2. Analyse des variants
+
+### Statistiques globales
+- **Total variants :** 24 809 068
+- **Substitutions :** 16 242 651 (65,5 %)
+- **Délétions :** 7 063 762 (28,5 %)
+- **Insertions :** 1 502 655 (6,1 %)
+- **Moyenne par souche :** 61 433 variants
+
+### Types de variants
+- **Substitutions** : remplacement d'un acide aminé
+- **Indels (délétions/insertions)** : ajout ou suppression de résidus
+
+---
+
+## 3. Problèmes rencontrés
+
+### 3.1 PROVEAN : Segmentation fault
+- **Erreur :** `Segmentation fault (core dumped)` à l'étape `clustering subject sequences`
+- **Cause :** Le programme `cd-hit` (utilisé par PROVEAN) a planté
+- **Raisons probables :**
+  - Manque de mémoire (RAM)
+  - Version incompatible des outils BLAST
+  - Base de données obsolète
+
+### 3.2 Serveur PTU : Stockage plein
+- **Espace disque :** 58G des 64G utilisés (96%)
+- **Fichiers à nettoyer :** `resultats_blast_backup` (28M), `Data` (1.9G), `03_Archive` (3.9G)
+- **Solution :** Partager avec les autres groupes pour nettoyer
+
+### 3.3 Base de données PROVEAN
+- **Problème :** PROVEAN ne fonctionne pas avec les bases de données récentes
+- **Solution suggérée :** Utiliser une autre base (UniRefXX)
+
+---
+
+## 4. Solution : SIFT
+
+### 4.1 Installation
+- **Outil :** SIFT4G
+- **Environnement :** Conda (`/data/projet1/06_Conda/sift_env/bin/sift4g`)
+- **Installation :** `conda install -c bioconda sift4g`
+
+### 4.2 Commande de base
+```bash
+sift4g -q <query.fasta> -d <database.fasta> --subst <subst_directory>
+```
+
+### 4.3 Format des fichiers nécessaires
+- **Query :** Fichier FASTA avec les séquences à tester
+- **Database :** Base de données protéique (ex: `uniprot_sprot.fasta`)
+- **Subst :** Répertoire contenant les fichiers `<nom>.subst` (correspondant au header FASTA)
+
+### 4.4 Résultats attendus
+- **Score SIFT :** Entre 0 et 1 (plus proche de 0 = plus délétère)
+- **Prédiction :** 
+  - Délétère (score < 0.05)
+  - Tolérant (score ≥ 0.05)
+
+---
+
+## 5. Conclusion et perspectives
+
+### 5.1 Avancements
+- Création du script SIFT4G
+- Identification des fichiers `.var` par souche
+- Validation de l'environnement SIFT
+
+### 5.2 Prochaines étapes
+1. Lancer l'analyse SIFT sur un sous-ensemble de gènes
+2. Vérifier la qualité des résultats (scores, prédictions)
+3. Préparer une base de données plus complète (UniRef, UniProt)
+4. Finaliser le rapport
+
+### 5.3 Problèmes résolus
+- Installation SIFT4G
+- Identification des fichiers nécessaires
+- Structure du projet
+
+### 5.4 Problèmes ouverts
+- Serveur PTU plein (à nettoyer)
+- Validation SIFT sur l'ensemble des variants
+

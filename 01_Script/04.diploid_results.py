@@ -2,7 +2,8 @@ import re
 from pathlib import Path
 from collections import defaultdict
 
-IN_DIR = Path("/data/projet1/02_Pipeline_Output/5_Blosum_Scores")
+# CORRECTION : Pointer vers le dossier où 03.5 a créé les fichiers summary
+IN_DIR = Path("/data/projet1/02_Pipeline_Output/3_SIFT_Mutations")
 OUT_DIR = Path("/data/projet1/02_Pipeline_Output/6_Diploid_Genotypes")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -23,19 +24,16 @@ for folder in all_folders:
         
         if summary_file.exists():
             strain_copies[strain_name][copy_num] = summary_file
-        else:
-            print(f"⚠️  Fichier 'gene_summary.tsv' manquant dans {folder.name}")
+        # On ne met pas de warning ici pour les dossiers en attente (sinon tu auras 796 avertissements)
 
-print(f"-> {len(strain_copies)} souches diploïdes complètes identifiées.")
+# Nettoyage des souches incomplètes
+complete_strains = {name: copies for name, copies in strain_copies.items() if '1' in copies and '2' in copies}
+print(f"-> {len(complete_strains)} souches diploïdes complètes identifiées.")
 
 global_matrix = defaultdict(dict)
 all_genes = set()
 
-for strain_name, copies in sorted(strain_copies.items()):
-    if '1' not in copies or '2' not in copies:
-        print(f"⚠️  Souche '{strain_name}' incomplète (HP1: {'OK' if '1' in copies else 'Manquant'}, HP2: {'OK' if '2' in copies else 'Manquant'})")
-        continue
-
+for strain_name, copies in sorted(complete_strains.items()):
     status_copy1, status_copy2 = {}, {}
 
     # Lecture HP1
@@ -44,7 +42,7 @@ for strain_name, copies in sorted(strain_copies.items()):
         for line in f:
             parts = line.strip().split('\t')
             if len(parts) >= 7:
-                # parts[-1] extrait 'is_functional' (YES/NO) indépendamment du nombre de colonnes
+                # parts[-1] extrait 'is_functional' (YES/NO/UNKNOWN)
                 status_copy1[parts[0]] = 1 if parts[-1] == 'YES' else 0
 
     # Lecture HP2
@@ -68,24 +66,25 @@ for strain_name, copies in sorted(strain_copies.items()):
         fout.write("protein\thp1_status\thp2_status\tdiploid_score\tphenotype\n")
         
         for prot_id in sorted(strain_genes):
-            c1 = status_copy1.get(prot_id, 1)
-            c2 = status_copy2.get(prot_id, 1)
+            c1 = status_copy1.get(prot_id, 0) # 0 par défaut si manquant
+            c2 = status_copy2.get(prot_id, 0)
+            
             diploid_score = c1 + c2
             
             if diploid_score == 2:
-                pheno = "FUNCTIONAL_HOMOZYGOTE"
-                functional_homo += 1
+                pheno = "FUNCTIONAL"
+                functional_homo += 1   # Tu peux renommer la variable functional_homo en count_functional si tu veux
             elif diploid_score == 1:
-                pheno = "FUNCTIONAL_HETEROZYGOTE"
-                functional_hetero += 1
-            else:
-                pheno = "INACTIVE_TOTAL_LOSS"
+                pheno = "MONOALLELIC_LOF"
+                functional_hetero += 1 # Tu peux renommer en count_monoallelic
+            elif diploid_score == 0:
+                pheno = "BIALLELIC_LOF"
                 total_loss += 1
 
             fout.write(f"{prot_id}\t{c1}\t{c2}\t{diploid_score}\t{pheno}\n")
             global_matrix[prot_id][strain_name] = diploid_score
 
-    print(f"  [OK] Souche {strain_name} -> Homo (2): {functional_homo} | Hétéro (1): {functional_hetero} | Inactif (0): {total_loss}")
+    print(f"  [OK] Souche {strain_name} -> Fonctionnel (2): {functional_homo} | Perte Monoallélique (1): {functional_hetero} | LoF Biallélique (0): {total_loss}")
 
 # Export de la matrice globale gènes x souches
 matrix_file = OUT_DIR / "diploid_matrix_all_strains.tsv"
@@ -94,10 +93,10 @@ if all_genes:
     with open(matrix_file, "w") as fmat:
         fmat.write("protein\t" + "\t".join(sorted_strains) + "\n")
         for prot_id in sorted(all_genes):
-            row_scores = [str(global_matrix[prot_id].get(s, 2)) for s in sorted_strains]
+            # Le score par défaut dans la matrice devient 0 (si la souche n'a aucune donnée pour ce gène)
+            row_scores = [str(global_matrix[prot_id].get(s, 0)) for s in sorted_strains]
             fmat.write(f"{prot_id}\t" + "\t".join(row_scores) + "\n")
 
-    print(f"\n✅ Matrice diploïde globale générée : {matrix_file.name}")
-    print(f"   -> Dimensions : {len(all_genes)} gènes x {len(sorted_strains)} souches.")
+    print(f"\n Matrice diploïde globale générée : {matrix_file.name}")
 else:
-    print("\n❌ Erreur : Aucune donnée à exporter. Vérifiez les fichiers.")
+    print("\n Aucune donnée à exporter. Vérifiez les fichiers.")
